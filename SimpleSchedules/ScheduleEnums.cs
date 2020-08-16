@@ -6,4 +6,9 @@
         Minute,
         Hour
     }
+
+    public enum DayOfMonth
+    {
+        LastDay = int.MaxValue
+    }
 }

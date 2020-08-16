@@ -29,10 +29,10 @@ namespace SimpleSchedules
         /// </summary>
         public Time? EndAt { get; }
 
-        private const int SCHEDULE_TYPE_ONCE = 0;
-        private const int SCHEDULE_TYPE_RECURRING = 1;
+        protected const int SCHEDULE_TYPE_ONCE = 0;
+        protected const int SCHEDULE_TYPE_RECURRING = 1;
 
-        private readonly int ScheduleType;
+        protected readonly int ScheduleType;
         protected readonly TimeSpan SpanStart;
         protected readonly TimeSpan SpanEnd;
 
@@ -86,6 +86,11 @@ namespace SimpleSchedules
             SpanEnd = GetTimeSpan(endAt, 23, 59, 59);
         }
 
+        /// <summary>
+        /// Returns next DateTime when this schedule need to fire event, relative to currentDate
+        /// </summary>
+        /// <param name="currentDate">Relative this value next date will return</param>
+        /// <returns>DateTime when next event need to fire or null if it should not</returns>
         public override DateTime? GetNext(DateTime currentDate)
         {
             if (!Enabled)
@@ -93,7 +98,7 @@ namespace SimpleSchedules
 
             if (ScheduleType == SCHEDULE_TYPE_ONCE)
             {
-                var occurs = currentDate.Date + OccursOnceAt.Value.GetCurrentValue();
+                var occurs = GetOccursOnceDateTime(currentDate);
 
                 if (currentDate < occurs)
                     return occurs;
@@ -118,6 +123,11 @@ namespace SimpleSchedules
 
             return new DateTime(currentDate.Year, currentDate.Month, currentDate.Day,
                 next.Hours, next.Minutes, next.Seconds);
+        }
+
+        protected DateTime GetOccursOnceDateTime(DateTime currentDate)
+        {
+            return currentDate.Date + OccursOnceAt.Value.GetCurrentValue();
         }
 
         private TimeSpan GetTimeSpan(Time? time, int defaultHour, int defaultMinute, int defaultSecond)

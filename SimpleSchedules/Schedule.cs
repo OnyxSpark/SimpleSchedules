@@ -33,5 +33,16 @@ namespace SimpleSchedules
             Description = description;
             Enabled = enabled;
         }
+
+        protected List<T> ProcessArrayInput<T>(T[] arr)
+        {
+            // remove possible duplicates
+            var set = new HashSet<T>(arr);
+
+            var list = new List<T>(set);
+            list.Sort();
+
+            return list;
+        }
     }
 }
