@@ -114,7 +114,7 @@ namespace SimpleSchedules
                 return new DateTime(currentDate.Year, currentDate.Month, currentDate.Day,
                     SpanStart.Hours, SpanStart.Minutes, SpanStart.Seconds);
 
-            if (currentDate.TimeOfDay >= SpanEnd || next >= SpanEnd)
+            if (currentDate.TimeOfDay >= SpanEnd || next > SpanEnd)
             {
                 var tmp = currentDate.AddDays(1);
                 return new DateTime(tmp.Year, tmp.Month, tmp.Day,

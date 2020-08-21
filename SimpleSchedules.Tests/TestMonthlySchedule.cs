@@ -28,7 +28,7 @@ namespace SimpleSchedules.Tests
 
             var expected = new DateTime(2020, 8, 16, 19, 40, 15);
 
-            var sch = new MonthlySchedule(new int[] { 1, 3, 8, DateTime.Now.Day }, new Time("19:40:15"));
+            var sch = new MonthlySchedule(new int[] { 1, 3, 8, 16, DateTime.Now.Day }, new Time("19:40:15"));
 
             var actual = sch.GetNext(input);
 
@@ -42,7 +42,7 @@ namespace SimpleSchedules.Tests
 
             var expected = new DateTime(2020, 9, 3, 19, 40, 15);
 
-            var sch = new MonthlySchedule(new int[] { 3, 8, DateTime.Now.Day }, new Time("19:40:15"));
+            var sch = new MonthlySchedule(new int[] { 16, 3, 8, DateTime.Now.Day }, new Time("19:40:15"));
 
             var actual = sch.GetNext(input);
 
@@ -112,6 +112,21 @@ namespace SimpleSchedules.Tests
             var input = new DateTime(2020, 8, 16, 1, 50, 30);
 
             var expected = new DateTime(2020, 8, 16, 2, 30, 15);
+
+            var sch = new MonthlySchedule(new int[] { 16, 21 }, DailyIntervalUnit.Hour, 2,
+                            new Time(2, 30, 15), new Time(12, 30, 15));
+
+            var actual = sch.GetNext(input);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Recurring_Inside_Active_Day_Custom_Active_Period_Inside()
+        {
+            var input = new DateTime(2020, 8, 16, 11, 50, 30);
+
+            var expected = new DateTime(2020, 8, 16, 12, 30, 15);
 
             var sch = new MonthlySchedule(new int[] { 16, 21 }, DailyIntervalUnit.Hour, 2,
                             new Time(2, 30, 15), new Time(12, 30, 15));

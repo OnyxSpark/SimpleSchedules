@@ -66,8 +66,7 @@ namespace SimpleSchedules
                 return GetNextOnCondition(currentDate, !IsActiveDay(currentDate) || alreadyFired);
             }
 
-            TimeSpan next = GetNextInterval(currentDate);
-            return GetNextOnCondition(currentDate, !IsActiveDay(currentDate) || next >= SpanEnd);
+            return GetNextOnCondition(currentDate, !IsActiveDay(currentDate));
         }
 
         private DateTime? GetNextOnCondition(DateTime currentDate, bool needNextDay)
@@ -90,8 +89,9 @@ namespace SimpleSchedules
         private bool IsActiveDay(DateTime currentDate)
         {
             int idx = days.IndexOf(currentDate.Day);
+            TimeSpan next = GetNextInterval(currentDate);
 
-            if (idx == -1 || (idx > -1 && ScheduleType == SCHEDULE_TYPE_RECURRING && currentDate.TimeOfDay >= SpanEnd))
+            if (idx == -1 || (idx > -1 && next > SpanEnd))
                 return false;
 
             return true;
