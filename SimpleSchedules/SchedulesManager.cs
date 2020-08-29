@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace SimpleSchedules
         private Dictionary<Schedule, DateTime> nextDates;
         private bool disposed = false;
 
+        private ConfigurationLoader configLoader = new ConfigurationLoader();
+
         /// <summary>
         /// Event, that will fire on current schedules
         /// </summary>
@@ -24,6 +27,27 @@ namespace SimpleSchedules
         {
             timer = new Timer(new TimerCallback(TimerTick), null, Timeout.Infinite, Timeout.Infinite);
             nextDates = new Dictionary<Schedule, DateTime>();
+        }
+
+        /// <summary>
+        /// Reads array of schedules from IConfiguration, using default section name "SimpleSchedules"
+        /// </summary>
+        /// <param name="configuration">Standard .Net Core IConfiguration object</param>
+        public void ReadFromConfiguration(IConfiguration configuration)
+        {
+            var schedules = configLoader.ReadFromConfiguration(configuration);
+            AddSchedules(schedules);
+        }
+
+        /// <summary>
+        /// Reads array of schedules from IConfiguration, using custom section name
+        /// </summary>
+        /// <param name="configuration">Standard .Net Core IConfiguration object</param>
+        /// <param name="section">Custom section name</param>
+        public void ReadFromConfiguration(IConfiguration configuration, string section)
+        {
+            var schedules = configLoader.ReadFromConfiguration(configuration, section);
+            AddSchedules(schedules);
         }
 
         private void TimerTick(object state)
@@ -98,12 +122,22 @@ namespace SimpleSchedules
         /// <summary>
         /// Add schedule to the list. This schedule's events will fire on the next timer tick (1 sec)
         /// </summary>
-        /// <param name="schedule">Object of one of the childs (DailySchedule, etc)</param>
+        /// <param name="schedule">Object of types: DailySchedule, WeeklySchedule, MonthlySchedule</param>
         public void AddSchedule(Schedule schedule)
         {
             CheckSchedule(schedule);
             schedules.Add(schedule);
             AddDateToDict(schedule);
+        }
+
+        /// <summary>
+        /// Add several schedules to the list. These schedules events will fire on the next timer tick (1 sec)
+        /// </summary>
+        /// <param name="schedules">Several objects of types: DailySchedule, WeeklySchedule, MonthlySchedule</param>
+        public void AddSchedules(params Schedule[] schedules)
+        {
+            foreach (var schedule in schedules)
+                AddSchedule(schedule);
         }
 
         /// <summary>

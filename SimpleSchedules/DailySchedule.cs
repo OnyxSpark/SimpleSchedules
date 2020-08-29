@@ -7,32 +7,35 @@ namespace SimpleSchedules
         /// <summary>
         /// Specifies that the event will only occur once a day at the specified time
         /// </summary>
-        public Time? OccursOnceAt { get; }
+        public Time? OccursOnceAt { get { return _occursOnceAt; } }
 
         /// <summary>
         /// Specifies the time interval for the event to occur
         /// </summary>
-        public int Interval { get; }
+        public int Interval { get { return _interval; } }
 
         /// <summary>
         /// Type of interval: hours, minutes, seconds
         /// </summary>
-        public DailyIntervalUnit IntervalUnit { get; }
+        public DailyIntervalUnit IntervalUnit { get { return _intervalUnit; } }
 
         /// <summary>
         /// Starting point of active period, within which event will fire. If not set, it will suppose begin of the day (00:00:00)
         /// </summary>
-        public Time? StartAt { get; }
+        public Time? StartAt { get { return _startAt; } }
 
         /// <summary>
         /// Ending point of active period, within which event will fire. If not set, it will suppose end of the day (23:59:59)
         /// </summary>
-        public Time? EndAt { get; }
+        public Time? EndAt { get { return _endAt; } }
 
-        protected const int SCHEDULE_TYPE_ONCE = 0;
-        protected const int SCHEDULE_TYPE_RECURRING = 1;
+        private readonly Time? _occursOnceAt;
+        private readonly int _interval;
+        private readonly DailyIntervalUnit _intervalUnit;
+        private readonly Time? _startAt;
+        private readonly Time? _endAt;
 
-        protected readonly int ScheduleType;
+        protected readonly ScheduleType Type;
         protected readonly TimeSpan SpanStart;
         protected readonly TimeSpan SpanEnd;
 
@@ -46,9 +49,7 @@ namespace SimpleSchedules
         /// <param name="description">Optional description of a schedule</param>
         public DailySchedule(Time occursOnceAt, bool enabled = true, string description = null)
         {
-            Init(enabled, description);
-            OccursOnceAt = occursOnceAt;
-            ScheduleType = SCHEDULE_TYPE_ONCE;
+            DailyInitOnce(ref _occursOnceAt, ref Type, occursOnceAt, enabled, description);
         }
 
         /// <summary>
@@ -63,6 +64,42 @@ namespace SimpleSchedules
         public DailySchedule(DailyIntervalUnit intervalUnit, int interval, Time? startAt, Time? endAt,
                                 bool enabled = true, string description = null)
         {
+            DailyInitRecurring(ref _interval, ref _intervalUnit, ref _startAt, ref _endAt, ref Type, ref SpanStart, ref SpanEnd,
+                               intervalUnit, interval, startAt, endAt, enabled, description);
+        }
+
+        /// <summary>
+        /// Intended to be used internally by ConfigurationLoader
+        /// </summary>
+        /// <param name="paramsObj">Filled object with init params</param>
+        public DailySchedule(ScheduleParams paramsObj)
+        {
+            if (paramsObj.OccursOnceAt.HasValue)
+            {
+                DailyInitOnce(ref _occursOnceAt, ref Type, paramsObj.OccursOnceAt,
+                              paramsObj.Enabled, paramsObj.Description);
+            }
+            else
+            {
+                DailyInitRecurring(ref _interval, ref _intervalUnit, ref _startAt, ref _endAt, ref Type, ref SpanStart, ref SpanEnd,
+                                   paramsObj.IntervalUnit.Value, paramsObj.Interval.Value, paramsObj.StartAt, paramsObj.EndAt,
+                                   paramsObj.Enabled, paramsObj.Description);
+            }
+        }
+
+        private void DailyInitOnce(ref Time? occursOnce, ref ScheduleType type,
+                                       Time? occursOnceAt, bool enabled, string description)
+        {
+            Init(enabled, description);
+            occursOnce = occursOnceAt;
+            type = ScheduleType.Once;
+        }
+
+        private void DailyInitRecurring(ref int schInterval, ref DailyIntervalUnit schIntervalUnit, ref Time? schStartAt,
+                                        ref Time? schEndAt, ref ScheduleType schType, ref TimeSpan spanStart, ref TimeSpan spanEnd,
+                                        DailyIntervalUnit intervalUnit, int interval, Time? startAt, Time? endAt,
+                                        bool enabled, string description)
+        {
             if (startAt.HasValue && endAt.HasValue)
             {
                 if (startAt.Value >= endAt.Value)
@@ -76,14 +113,14 @@ namespace SimpleSchedules
 
             Init(enabled, description);
 
-            Interval = interval;
-            IntervalUnit = intervalUnit;
-            StartAt = startAt;
-            EndAt = endAt;
-            ScheduleType = SCHEDULE_TYPE_RECURRING;
+            schInterval = interval;
+            schIntervalUnit = intervalUnit;
+            schStartAt = startAt;
+            schEndAt = endAt;
+            schType = ScheduleType.Recurring;
 
-            SpanStart = GetTimeSpan(startAt, 0, 0, 0);
-            SpanEnd = GetTimeSpan(endAt, 23, 59, 59);
+            spanStart = GetTimeSpan(startAt, 0, 0, 0);
+            spanEnd = GetTimeSpan(endAt, 23, 59, 59);
         }
 
         /// <summary>
@@ -96,7 +133,7 @@ namespace SimpleSchedules
             if (!Enabled)
                 return null;
 
-            if (ScheduleType == SCHEDULE_TYPE_ONCE)
+            if (Type == ScheduleType.Once)
             {
                 var occurs = GetOccursOnceDateTime(currentDate);
 
@@ -106,7 +143,7 @@ namespace SimpleSchedules
                     return occurs.AddDays(1);
             }
 
-            // for SCHEDULE_TYPE_RECURRING
+            // for recurring schedule
 
             TimeSpan next = GetNextInterval(currentDate);
 
@@ -127,7 +164,7 @@ namespace SimpleSchedules
 
         protected DateTime GetOccursOnceDateTime(DateTime currentDate)
         {
-            return currentDate.Date + OccursOnceAt.Value.GetCurrentValue();
+            return currentDate.Date + _occursOnceAt.Value.GetCurrentValue();
         }
 
         private TimeSpan GetTimeSpan(Time? time, int defaultHour, int defaultMinute, int defaultSecond)

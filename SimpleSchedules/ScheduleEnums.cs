@@ -11,4 +11,10 @@
     {
         LastDay = int.MaxValue
     }
+
+    public enum ScheduleType
+    {
+        Once,
+        Recurring
+    }
 }

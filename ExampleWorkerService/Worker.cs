@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SimpleSchedules;
@@ -14,11 +15,13 @@ namespace ExampleWorkerService
 
         private readonly ILogger<Worker> _logger;
         private readonly ISchedulesManager _manager;
+        private readonly IConfiguration _config;
 
-        public Worker(ILogger<Worker> logger, ISchedulesManager manager)
+        public Worker(ILogger<Worker> logger, ISchedulesManager manager, IConfiguration config)
         {
             _logger = logger;
             _manager = manager;
+            _config = config;
 
             // Set the event handler
 
@@ -27,14 +30,17 @@ namespace ExampleWorkerService
             // creates a schedule, which will fire every day every 30 seconds from 07:00:00 till 23:00:00
 
             var secSchedule = new DailySchedule(DailyIntervalUnit.Second, 30,
-                                    new Time(7, 0, 0), new Time(23, 0, 0));
+                                    new Time(7, 0, 0), new Time(23, 0, 0), false);
 
             // creates a schedule, which will fire every day every 2 minutes from 00:00:00 till 23:59:59
 
-            var minSchedule = new DailySchedule(DailyIntervalUnit.Minute, 2, null, null);
+            var minSchedule = new DailySchedule(DailyIntervalUnit.Minute, 2, null, null, false);
 
-            _manager.AddSchedule(secSchedule);
-            _manager.AddSchedule(minSchedule);
+            _manager.AddSchedules(secSchedule, minSchedule);
+
+            // Load from IConfiguration
+
+            _manager.ReadFromConfiguration(_config);
         }
 
         private void Schedules_EventOccurred(object sender, ScheduleEventArgs e)
@@ -59,7 +65,7 @@ namespace ExampleWorkerService
                 var sch = schedule as DailySchedule;
 
                 if (sch != null)
-                    props = $"DailyIntervalUnit = {sch.IntervalUnit}, Interval = {sch.Interval}";
+                    props = $"DailyIntervalUnit = {sch.IntervalUnit}, Interval = {sch.Interval}, Desc = {sch.Description}";
 
                 _logger.LogInformation($"Event occurred at {DateTime.Now}. Schedule properties: {props}");
             }

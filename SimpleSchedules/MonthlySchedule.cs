@@ -52,6 +52,15 @@ namespace SimpleSchedules
         }
 
         /// <summary>
+        /// Intended to be used internally by ConfigurationLoader
+        /// </summary>
+        /// <param name="paramsObj">Filled object with init params</param>
+        public MonthlySchedule(ScheduleParams paramsObj) : base(paramsObj)
+        {
+            InitMonthlySchedule(paramsObj.LaunchDays);
+        }
+
+        /// <summary>
         /// Returns next DateTime when this schedule need to fire event, relative to currentDate and current active days
         /// </summary>
         /// <param name="currentDate">Relative this value next date will return</param>
@@ -60,7 +69,7 @@ namespace SimpleSchedules
         {
             if (days.Count == 0) return null;
 
-            if (ScheduleType == SCHEDULE_TYPE_ONCE)
+            if (Type == ScheduleType.Once)
             {
                 bool alreadyFired = GetOccursOnceDateTime(currentDate) <= currentDate;
                 return GetNextOnCondition(currentDate, !IsActiveDay(currentDate) || alreadyFired);
