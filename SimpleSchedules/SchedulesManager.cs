@@ -8,12 +8,16 @@ namespace SimpleSchedules
 {
     public class SchedulesManager : ISchedulesManager, IDisposable
     {
-        private List<Schedule> schedules = new List<Schedule>();
         private Timer timer;
         private Dictionary<Schedule, DateTime> nextDates;
         private bool disposed = false;
 
-        private ConfigurationLoader configLoader = new ConfigurationLoader();
+        private IConfigurationLoader configLoader = new ConfigurationLoader();
+
+        /// <summary>
+        /// Returns list of current schedules
+        /// </summary>
+        public List<Schedule> Schedules { get; private set; }
 
         /// <summary>
         /// Event, that will fire on current schedules
@@ -27,6 +31,7 @@ namespace SimpleSchedules
         {
             timer = new Timer(new TimerCallback(TimerTick), null, Timeout.Infinite, Timeout.Infinite);
             nextDates = new Dictionary<Schedule, DateTime>();
+            Schedules = new List<Schedule>();
         }
 
         /// <summary>
@@ -126,7 +131,7 @@ namespace SimpleSchedules
         public void AddSchedule(Schedule schedule)
         {
             CheckSchedule(schedule);
-            schedules.Add(schedule);
+            Schedules.Add(schedule);
             AddDateToDict(schedule);
         }
 
@@ -148,7 +153,7 @@ namespace SimpleSchedules
         {
             CheckSchedule(schedule);
             RemoveDateFromDict(schedule);
-            schedules.Remove(schedule);
+            Schedules.Remove(schedule);
         }
 
         /// <summary>

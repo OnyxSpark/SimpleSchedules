@@ -1,0 +1,40 @@
+{
+  "SimpleSchedules": [
+    {
+      "Type": "SimpleSchedules.WeeklySchedule",
+      "DaysOfWeek": [ "Monday", "Thursday", "saturday" ],
+      "IntervalUnit": "Second",
+      "Interval": 3,
+      "StartAt": "12:00:12",
+      "EndAt": "21:05:22"
+    },
+    {
+      "Type": "SimpleSchedules.MonthlySchedule",
+      "LaunchDays": [ 1, 5, 15 ],
+      "IntervalUnit": "Second",
+      "Interval": 3,
+      "StartAt": "12:00:12",
+      "EndAt": "21:05:22"
+    },
+    {
+      "Type": "SimpleSchedules.DailySchedule",
+      "IntervalUnit": "Minute",
+      "Interval": 1,
+      "Enabled": true,
+      "Description": "minute schedule description"
+    },
+    {
+      "Type": "SimpleSchedules.DailySchedule",
+      "OccursOnceAt": "12:55",
+      "Description": "OneTime schedule description"
+    }
+  ],
+  "CustomSectionSch": [
+    {
+      "Type": "SimpleSchedules.DailySchedule",
+      "OccursOnceAt": "12:55",
+      "Description": "OneTime schedule description",
+      "Enabled": false
+    }
+  ]
+}

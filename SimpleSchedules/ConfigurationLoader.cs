@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace SimpleSchedules
 {
-    class ConfigurationLoader
+    internal class ConfigurationLoader : IConfigurationLoader
     {
         private readonly string DEFAULT_SECTION = "SimpleSchedules";
 

@@ -28,7 +28,7 @@ namespace SimpleSchedules.Tests
 
             var expected = new DateTime(2020, 8, 16, 19, 40, 15);
 
-            var sch = new MonthlySchedule(new int[] { 1, 3, 8, 16, DateTime.Now.Day }, new Time("19:40:15"));
+            var sch = new MonthlySchedule(new int[] { 1, 3, 8, 16 }, new Time("19:40:15"));
 
             var actual = sch.GetNext(input);
 
@@ -42,7 +42,7 @@ namespace SimpleSchedules.Tests
 
             var expected = new DateTime(2020, 9, 3, 19, 40, 15);
 
-            var sch = new MonthlySchedule(new int[] { 16, 3, 8, DateTime.Now.Day }, new Time("19:40:15"));
+            var sch = new MonthlySchedule(new int[] { 16, 3, 8 }, new Time("19:40:15"));
 
             var actual = sch.GetNext(input);
 
