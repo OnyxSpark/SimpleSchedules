@@ -29,13 +29,18 @@ namespace SimpleSchedules
         /// </summary>
         public Time? EndAt { get { return _endAt; } }
 
+        /// <summary>
+        /// Type of schedule (Once, Recurring)
+        /// </summary>
+        public ScheduleType Type { get { return _type; } }
+
         private readonly Time? _occursOnceAt;
         private readonly int _interval;
         private readonly DailyIntervalUnit _intervalUnit;
         private readonly Time? _startAt;
         private readonly Time? _endAt;
+        private readonly ScheduleType _type;
 
-        protected readonly ScheduleType Type;
         protected readonly TimeSpan SpanStart;
         protected readonly TimeSpan SpanEnd;
 
@@ -49,7 +54,7 @@ namespace SimpleSchedules
         /// <param name="description">Optional description of a schedule</param>
         public DailySchedule(Time occursOnceAt, bool enabled = true, string description = null)
         {
-            DailyInitOnce(ref _occursOnceAt, ref Type, occursOnceAt, enabled, description);
+            DailyInitOnce(ref _occursOnceAt, ref _type, occursOnceAt, enabled, description);
         }
 
         /// <summary>
@@ -64,7 +69,7 @@ namespace SimpleSchedules
         public DailySchedule(DailyIntervalUnit intervalUnit, int interval, Time? startAt, Time? endAt,
                                 bool enabled = true, string description = null)
         {
-            DailyInitRecurring(ref _interval, ref _intervalUnit, ref _startAt, ref _endAt, ref Type, ref SpanStart, ref SpanEnd,
+            DailyInitRecurring(ref _interval, ref _intervalUnit, ref _startAt, ref _endAt, ref _type, ref SpanStart, ref SpanEnd,
                                intervalUnit, interval, startAt, endAt, enabled, description);
         }
 
@@ -76,12 +81,12 @@ namespace SimpleSchedules
         {
             if (paramsObj.OccursOnceAt.HasValue)
             {
-                DailyInitOnce(ref _occursOnceAt, ref Type, paramsObj.OccursOnceAt,
+                DailyInitOnce(ref _occursOnceAt, ref _type, paramsObj.OccursOnceAt,
                               paramsObj.Enabled, paramsObj.Description);
             }
             else
             {
-                DailyInitRecurring(ref _interval, ref _intervalUnit, ref _startAt, ref _endAt, ref Type, ref SpanStart, ref SpanEnd,
+                DailyInitRecurring(ref _interval, ref _intervalUnit, ref _startAt, ref _endAt, ref _type, ref SpanStart, ref SpanEnd,
                                    paramsObj.IntervalUnit.Value, paramsObj.Interval.Value, paramsObj.StartAt, paramsObj.EndAt,
                                    paramsObj.Enabled, paramsObj.Description);
             }

@@ -27,18 +27,35 @@ namespace ExampleWorkerService
 
             _manager.EventOccurred += Schedules_EventOccurred;
 
-            // creates a schedule, which will fire every day every 30 seconds from 07:00:00 till 23:00:00
+            // creates a schedule, which will fire event every day every 30 seconds from 07:00:00 till 23:00:00
 
-            var secSchedule = new DailySchedule(DailyIntervalUnit.Second, 30,
-                                    new Time(7, 0, 0), new Time(23, 0, 0), false);
+            var daily1 = new DailySchedule(DailyIntervalUnit.Second, 30,
+                                    new Time(7, 0, 0), new Time(23, 0, 0),
+                                    enabled: true, description: "every day every 30 seconds");
 
-            // creates a schedule, which will fire every day every 2 minutes from 00:00:00 till 23:59:59
+            // creates a schedule, which will fire event every day every 2 minutes from 00:00:00 till 23:59:59,
+            // schedule will be created disabled
 
-            var minSchedule = new DailySchedule(DailyIntervalUnit.Minute, 2, null, null, false);
+            var daily2 = new DailySchedule(DailyIntervalUnit.Minute, 2, null, null,
+                                    enabled: false, description: "every day every 2 minutes");
 
-            _manager.AddSchedules(secSchedule, minSchedule);
+            // creates a schedule, which will fire event every day at 12:15:00
 
-            // Load from IConfiguration
+            var daily3 = new DailySchedule(new Time(12, 50, 0));
+
+            // creates a schedule, which will fire event on every Monday and Wednesday,
+            // every hour from 00:00:00 till 23:59:59
+
+            var weekly1 = new WeeklySchedule(new DayOfWeek[] { DayOfWeek.Monday, DayOfWeek.Wednesday },
+                                    DailyIntervalUnit.Hour, 1, null, null);
+
+            // creates a schedule, which will fire event on 1, 2, 15 day of every month at 14:20:15
+
+            var monthly1 = new MonthlySchedule(new int[] { 1, 2, 15 }, new Time("14:20:15"));
+
+            _manager.AddSchedules(daily1, daily2, daily3, weekly1, monthly1);
+
+            // Load from IConfiguration, section "SimpleSchedules" (see appsettings.json)
 
             _manager.ReadFromConfiguration(_config);
         }
@@ -46,26 +63,28 @@ namespace ExampleWorkerService
         private void Schedules_EventOccurred(object sender, ScheduleEventArgs e)
         {
             /*
-            Output will something like that:
+            Output will be something like that:
 
-            Event occurred at 11.08.2020 16:42:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30
-            Event occurred at 11.08.2020 16:42:00. Schedule properties: DailyIntervalUnit = Minute, Interval = 2
-            Event occurred at 11.08.2020 16:42:30. Schedule properties: DailyIntervalUnit = Second, Interval = 30
-            Event occurred at 11.08.2020 16:43:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30
-            Event occurred at 11.08.2020 16:43:30. Schedule properties: DailyIntervalUnit = Second, Interval = 30
-            Event occurred at 11.08.2020 16:44:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30
-            Event occurred at 11.08.2020 16:44:00. Schedule properties: DailyIntervalUnit = Minute, Interval = 2
-            Event occurred at 11.08.2020 16:44:30. Schedule properties: DailyIntervalUnit = Second, Interval = 30
-            Event occurred at 11.08.2020 16:45:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30
+            Event occurred at 02.09.2020 12:49:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30, Desc = every day every 30 seconds
+            Event occurred at 02.09.2020 12:49:00. Schedule properties: DailyIntervalUnit = Minute, Interval = 1, Desc = minute schedule description
+            Event occurred at 02.09.2020 12:49:30. Schedule properties: DailyIntervalUnit = Second, Interval = 30, Desc = every day every 30 seconds
+            Event occurred at 02.09.2020 12:50:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30, Desc = every day every 30 seconds
+            Event occurred at 02.09.2020 12:50:00. Schedule properties: OccursOnceAt = 12:50:00
+            Event occurred at 02.09.2020 12:50:00. Schedule properties: DailyIntervalUnit = Minute, Interval = 1, Desc = minute schedule description
+            Event occurred at 02.09.2020 12:50:30. Schedule properties: DailyIntervalUnit = Second, Interval = 30, Desc = every day every 30 seconds
             */
 
             foreach (var schedule in e.OccurredSchedules)
             {
                 string props = "";
-                var sch = schedule as DailySchedule;
 
-                if (sch != null)
-                    props = $"DailyIntervalUnit = {sch.IntervalUnit}, Interval = {sch.Interval}, Desc = {sch.Description}";
+                if (schedule is DailySchedule sch)
+                {
+                    if (sch.Type == ScheduleType.Recurring)
+                        props = $"DailyIntervalUnit = {sch.IntervalUnit}, Interval = {sch.Interval}, Desc = {sch.Description}";
+                    else
+                        props = $"OccursOnceAt = {sch.OccursOnceAt.GetValueOrDefault().GetCurrentValue()}";
+                }
 
                 _logger.LogInformation($"Event occurred at {DateTime.Now}. Schedule properties: {props}");
             }
