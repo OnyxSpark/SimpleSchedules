@@ -38,9 +38,9 @@ namespace SimpleSchedules
         /// Reads array of schedules from IConfiguration, using default section name "SimpleSchedules"
         /// </summary>
         /// <param name="configuration">Standard .Net Core IConfiguration object</param>
-        public void ReadFromConfiguration(IConfiguration configuration)
+        public void LoadFrom(IConfiguration configuration)
         {
-            var schedules = configLoader.ReadFromConfiguration(configuration);
+            var schedules = configLoader.LoadFrom(configuration);
             AddSchedules(schedules);
         }
 
@@ -49,9 +49,19 @@ namespace SimpleSchedules
         /// </summary>
         /// <param name="configuration">Standard .Net Core IConfiguration object</param>
         /// <param name="section">Custom section name</param>
-        public void ReadFromConfiguration(IConfiguration configuration, string section)
+        public void LoadFrom(IConfiguration configuration, string section)
         {
-            var schedules = configLoader.ReadFromConfiguration(configuration, section);
+            var schedules = configLoader.LoadFrom(configuration, section);
+            AddSchedules(schedules);
+        }
+
+        /// <summary>
+        /// Reads array of schedules from bunch of ScheduleConfig objects. Useful when deserealizing from JSON.
+        /// </summary>
+        /// <param name="scheduleConfigs">Collection of filled ScheduleConfig objects</param>
+        public void LoadFrom(IEnumerable<ScheduleConfig> scheduleConfigs)
+        {
+            var schedules = configLoader.LoadFrom(scheduleConfigs);
             AddSchedules(schedules);
         }
 

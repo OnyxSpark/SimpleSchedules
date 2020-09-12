@@ -1,12 +1,12 @@
-## SimpleSchedules
+# SimpleSchedules
 
-.NET Core library, which supports event triggering, based on several schedules
+.NET Core library, which supports event triggering, based on several schedules.
 
-#### Description
+### Description
 
 The library is made to work in .NET Core Worker Services, where it is necessary to start some work according to one or several schedules. An example worker service with the same code, which shown below, is in the `ExampleWorkerService` project.
 
-#### How to use
+### How to use
 
 Schedules can be set both in code and via `IConfiguration`.
 
@@ -118,7 +118,7 @@ private void Schedules_EventOccurred(object sender, ScheduleEventArgs e)
 
 After launch, the schedule manager generates events at the time points, specified in these schedules.
 
-Example of triggering an event:
+Example of triggering an events:
 
 ```
 Event occurred at 02.09.2020 12:49:00. Schedule properties: DailyIntervalUnit = Second, Interval = 30, Desc = every day every 30 seconds

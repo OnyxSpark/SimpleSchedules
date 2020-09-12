@@ -19,17 +19,22 @@ namespace SimpleSchedules
             textInfo = cultureInfo.TextInfo;
         }
 
-        public Schedule[] ReadFromConfiguration(IConfiguration configuration)
+        public Schedule[] LoadFrom(IConfiguration configuration)
         {
-            return ReadFromConfiguration(configuration, DEFAULT_SECTION);
+            return LoadFrom(configuration, DEFAULT_SECTION);
         }
 
-        public Schedule[] ReadFromConfiguration(IConfiguration configuration, string section)
+        public Schedule[] LoadFrom(IConfiguration configuration, string section)
+        {
+            var cfgList = BindConfigSection(configuration, section);
+            return LoadFrom(cfgList);
+        }
+
+        public Schedule[] LoadFrom(IEnumerable<ScheduleConfig> scheduleConfigs)
         {
             var list = new List<Schedule>();
-            var cfgList = BindConfigSection(configuration, section);
 
-            foreach (var schConfig in cfgList)
+            foreach (var schConfig in scheduleConfigs)
             {
                 var schType = FindType(schConfig.Type);
 

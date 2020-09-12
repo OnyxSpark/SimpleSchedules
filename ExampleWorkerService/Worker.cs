@@ -57,7 +57,7 @@ namespace ExampleWorkerService
 
             // Load from IConfiguration, section "SimpleSchedules" (see appsettings.json)
 
-            _manager.ReadFromConfiguration(_config);
+            _manager.LoadFrom(_config);
         }
 
         private void Schedules_EventOccurred(object sender, ScheduleEventArgs e)
