@@ -12,20 +12,23 @@ namespace SimpleSchedules
         /// Reads array of schedules from IConfiguration, using default section name "SimpleSchedules"
         /// </summary>
         /// <param name="configuration">Standard .Net Core IConfiguration object</param>
-        void LoadFrom(IConfiguration configuration);
+        /// <returns>Array of schedules, which were loaded into manager</returns>
+        Schedule[] LoadFrom(IConfiguration configuration);
 
         /// <summary>
         /// Reads array of schedules from IConfiguration, using custom section name
         /// </summary>
         /// <param name="configuration">Standard .Net Core IConfiguration object</param>
         /// <param name="section">Custom section name</param>
-        void LoadFrom(IConfiguration configuration, string section);
+        /// <returns>Array of schedules, which were loaded into manager</returns>
+        Schedule[] LoadFrom(IConfiguration configuration, string section);
 
         /// <summary>
         /// Reads array of schedules from bunch of ScheduleConfig objects. Useful when deserealizing from JSON.
         /// </summary>
         /// <param name="scheduleConfigs">Collection of filled ScheduleConfig objects</param>
-        void LoadFrom(IEnumerable<ScheduleConfig> scheduleConfigs);
+        /// <returns>Array of schedules, which were loaded into manager</returns>
+        Schedule[] LoadFrom(IEnumerable<ScheduleConfig> scheduleConfigs);
 
         /// <summary>
         /// Add schedule to the list. This schedule's events will fire on the next timer tick (1 sec)
